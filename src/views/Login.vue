@@ -5,14 +5,14 @@
         class="flex bg-gray-50 rounded-lg max-w-md md-auto flex-col text-center shadow-2xl mx-auto"
       >
         <div class="p-8">
-          <span class="text-2xl">Login</span>
+          <span class="text-3xl font-mono">LOGIN</span>
           <div class="flex flex-col justify-start mb-4 py-4 px-4 rounded">
             <label class="text-gray-900 text-left">Email</label>
             <div class="flex flex-col">
               <input
                 class="w-full pl-3 py-4 rounded-lg text-xs placeholder-blueGray-400 font-semibold leading-none bg-blueGray-50 outline-none"
                 type="email"
-                placeholder="name@email.com"
+                placeholder="your.email@email.com"
                 v-model="login.email"
               />
             </div>
@@ -124,5 +124,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>
