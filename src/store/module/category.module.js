@@ -36,12 +36,18 @@ const actions = {
 
   async getAllCategoryList(
     context,
-    { filter } = {
+    { page, per_page, filter } = {
       filter: "",
     }
   ) {
     try {
       const params = new URLSearchParams();
+      if (page != null) {
+        params.append("page", page);
+      }
+      if (per_page != null) {
+        params.append("per_page", per_page);
+      }
       if (filter != null && filter != "") {
         params.append("filter", filter);
       }

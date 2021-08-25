@@ -1,10 +1,15 @@
 <template>
   <dashboard-layouts>
+    <!-- kontainer -->
     <div class="flex justify-center p-5 flex-grow h-full">
       <div class="pt-1 px-5 pb-5 bg-white rounded-xl w-full">
+        <!-- field judul -->
         <div class="text-2xl text-black mt-5 font-bold text-center">
           Daftar Kategori
         </div>
+        <!-- field judul -->
+
+        <!-- field filter -->
         <div class="flex py-1">
           <div class="relative flex w-full flex-wrap items-stretch pr-1">
             <t-input v-model="filter" placeholder="Search Here" />
@@ -33,7 +38,45 @@
             </button>
           </div>
         </div>
+        <!-- field filter -->
+
+        <!-- tabel -->
+        <div class="text-black overflow-x-auto py-1">
+          <t-table
+            :headers="headers"
+            :data="categoryList.data"
+            variant="default"
+          >
+            <template slot="row" slot-scope="props">
+              <tr :class="[props.trClass]">
+                <td :class="props.tdClass">
+                  {{ props.row.id }}
+                </td>
+                <td :class="props.tdClass">
+                  {{ props.row.name }}
+                </td>
+                <td :class="props.tdClass" class="flex flex-row">
+                  <t-button
+                    variant="secondary"
+                    class="mr-2 bg-green-400"
+                    @click="openFormModal(props.row.id)"
+                    >Edit</t-button
+                  >
+                  <t-button
+                    variant="secondary"
+                    class="bg-red-400"
+                    @click="confirmDelete(props.row.id)"
+                    >Delete</t-button
+                  >
+                </td>
+              </tr>
+            </template>
+          </t-table>
+        </div>
+        <!-- tabel -->
       </div>
+
+      <!-- field modal add kategori -->
       <t-modal v-model="formModal" header="Manage Category">
         <div>
           <label for="">Nama Kategori</label>
@@ -57,7 +100,9 @@
           </div>
         </template>
       </t-modal>
+      <!-- field modal add kategori -->
     </div>
+    <!-- kontainer -->
   </dashboard-layouts>
 </template>
 
@@ -79,8 +124,26 @@ export default {
   data() {
     return {
       filter: "",
+      // currentPage: 1,
+      // perPage: 7,
       formModal: false,
+      selectedId: null,
       selectedAction: "create",
+      errors: {},
+      headers: [
+        {
+          value: "id",
+          text: "Id",
+        },
+        {
+          value: "name",
+          text: "Nama",
+        },
+        {
+          value: "actions",
+          text: "Actions",
+        },
+      ],
     };
   },
   computed: {
@@ -97,12 +160,33 @@ export default {
       "clearError",
     ]),
 
-    openFormModal() {
+    mounted() {
+      this.fetchData();
+      this.clearError();
+    },
+
+    clearImage() {
+      this.selectedImage = null;
+    },
+
+    openFormModal(id = null) {
       this.formModal = true;
+      this.clearError();
+
+      if (id != null) {
+        this.selectedId = id;
+        this.selectedAction = "edit";
+        this.getCategory({ id });
+      } else {
+        this.selectedId = null;
+        this.selectedAction = "create";
+        this.clearCategory();
+      }
     },
 
     closeFormModal() {
       this.formModal = false;
+      this.clearError();
     },
 
     async submitCategory() {
@@ -115,6 +199,7 @@ export default {
             this.$toast.success("Data Saved Successfully", {
               duration: 3000,
             });
+            this.selectedImage = null;
             this.clearError();
           } catch (error) {
             console.log(error);
@@ -131,6 +216,7 @@ export default {
             this.$toast.success("Data Saved Successfully", {
               duration: 3000,
             });
+            this.selectedImage = null;
             this.clearError();
           } catch (error) {
             console.log(error);
@@ -141,6 +227,14 @@ export default {
         console.log(error);
         this.$toast.error(error.message);
       }
+    },
+
+    async fetchData() {
+      await this.getAllCategoryList({
+        filter: this.filter,
+        page: this.currentPage,
+        per_page: this.perPage,
+      });
     },
   },
 };

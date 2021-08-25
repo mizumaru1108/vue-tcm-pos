@@ -7,6 +7,7 @@
         <div class="p-8">
           <span class="text-3xl font-mono">LOGIN</span>
           <div class="flex flex-col justify-start mb-4 py-4 px-4 rounded">
+            <!-- field login -->
             <label class="text-gray-900 text-left">Email</label>
             <div class="flex flex-col">
               <input
@@ -22,11 +23,14 @@
             >
               {{ errorData.errors.email[0] }}
             </span>
+            <!-- field login -->
           </div>
+
           <div class="flex flex-col mb-6 px-4 rounded">
             <label class="text-gray-900 text-left">
               Password
             </label>
+            <!-- field passworxd -->
             <div class="flex flex-row">
               <input
                 :type="passwordField"
@@ -67,6 +71,7 @@
             >
               {{ errorData.errors.password[0] }}
             </span>
+            <!-- field password -->
             <button
               class="mt-3 block w-full p-4 text-center text-xs text-white font-semibold leading-none bg-green-600 hover:bg-green-500 rounded"
               @click="onLogin"

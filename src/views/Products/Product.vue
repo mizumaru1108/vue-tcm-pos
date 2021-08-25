@@ -51,6 +51,18 @@
         </div>
       </div>
     </div>
+    <t-modal v-model="formModel" header="Kelola Kategori">
+      <div>
+        <label for="">Nama Kategori</label>
+        <t-input v-model="categoryData.name" />
+        <span v-if="errorData.errors && errorData.errors.name">
+          {{ errorData.errors.name[0] }}
+        </span>
+      </div>
+      <template v-slot:footer>
+        <div class="flex justify-between"></div>
+      </template>
+    </t-modal>
   </dashboard-layouts>
 </template>
 
