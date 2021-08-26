@@ -83,10 +83,14 @@
       </div>
 
       <!-- field modal add kategori -->
-      <t-modal v-model="formModal" header="Manage Category">
+      <!-- <t-modal v-model="formModal" header="Manage Category"> -->
+      <t-modal v-model="formModal">
+        <template v-slot:header>
+          {{ selectedAction == "create" ? "Create Category" : "Edit Category" }}
+        </template>
         <div>
           <label for="">Nama Kategori</label>
-          <t-input v-model="categoryData.name" />
+          <t-input v-model="categoryData.name" @keyup.enter="submitCategory" />
           <span
             class="text-sm text-left text-red-600"
             v-if="errorData.errors && errorData.errors.name"
@@ -101,7 +105,7 @@
               Cancel
             </t-button>
             <t-button @click="submitCategory" type="button">
-              Save
+              {{ selectedAction == "create" ? "Save" : "Update" }}
             </t-button>
           </div>
         </template>
