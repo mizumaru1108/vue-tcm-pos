@@ -1,24 +1,24 @@
 import axios from "axios";
 const state = {
-  categoryList: {
+  productList: {
     data: [],
   },
-  categoryData: {},
-  allCategory: [],
+  productData: {},
+  allProduct: [],
   errorData: {
     errors: [],
   },
 };
 const getters = {};
 const mutations = {
-  setCategoryList(state, payload) {
-    state.categoryList = payload;
+  setProductList(state, payload) {
+    state.productList = payload;
   },
-  setCategory(state, payload) {
-    state.categoryData = payload;
+  setProduct(state, payload) {
+    state.productData = payload;
   },
-  setShowAllCategory(state, payload) {
-    state.allCategory = payload;
+  setShowAllProduct(state, payload) {
+    state.allProduct = payload;
   },
   setError(state, payload) {
     state.errorData = payload;
@@ -34,7 +34,7 @@ const actions = {
     context.commit("setError", payload);
   },
 
-  async getAllCategoryList(
+  async getAllProductList(
     context,
     { page, per_page, filter } = {
       filter: "",
@@ -52,36 +52,36 @@ const actions = {
         params.append("filter", filter);
       }
       const response = await axios.get(
-        `${process.env.VUE_APP_BASE_URL}/api/category?${params}`
+        `${process.env.VUE_APP_BASE_URL}/api/product?${params}`
       );
-      context.commit("setCategoryList", response.data);
+      context.commit("setProductList", response.data);
     } catch (error) {
       console.error(error);
     }
   },
 
-  async getCategory(context, { id }) {
+  async getProduct(context, { id }) {
     try {
       const response = await axios.get(
-        `${process.env.VUE_APP_BASE_URL}/api/category/${id}`
+        `${process.env.VUE_APP_BASE_URL}/api/product/${id}`
       );
-      context.commit("setCategory", response.data.data);
+      context.commit("setProduct", response.data.data);
     } catch (error) {
       console.log(error);
     }
   },
 
-  clearCategory(context) {
-    context.commit("setCategory", {});
+  clearProduct(context) {
+    context.commit("setProduct", {});
   },
 
-  async createCategory(context, { payload }) {
+  async createProduct(context, { payload }) {
     try {
       const response = await axios.post(
-        `${process.env.VUE_APP_BASE_URL}/api/category`,
+        `${process.env.VUE_APP_BASE_URL}/api/product`,
         payload
       );
-      context.dispatch("clearCategory");
+      context.dispatch("clearProduct");
       return response.data;
     } catch (error) {
       let errorMessage = "";
@@ -96,13 +96,13 @@ const actions = {
     }
   },
 
-  async updateCategory(context, { id, payload }) {
+  async updateProduct(context, { id, payload }) {
     try {
       const response = await axios.put(
-        `${process.env.VUE_APP_BASE_URL}/api/category/${id}`,
+        `${process.env.VUE_APP_BASE_URL}/api/product/${id}`,
         payload
       );
-      context.dispatch("clearCategory");
+      context.dispatch("clearProduct");
       return response.data;
     } catch (error) {
       let errorMessage = "";
@@ -117,10 +117,10 @@ const actions = {
     }
   },
 
-  async deleteCategory(context, { id }) {
+  async deleteProduct(context, { id }) {
     try {
       const response = await axios.delete(
-        `${process.env.VUE_APP_BASE_URL}/api/category/${id}`
+        `${process.env.VUE_APP_BASE_URL}/api/product/${id}`
       );
 
       return response.data;
@@ -129,19 +129,19 @@ const actions = {
     }
   },
 
-  async category(context) {
+  async product(context) {
     try {
       const response = await axios.get(
-        `${process.env.VUE_APP_BASE_URL}/api/categories`
+        `${process.env.VUE_APP_BASE_URL}/api/products`
       );
-      context.commit("setShowAllCategory", response.data.data);
+      context.commit("setShowAllProduct", response.data.data);
     } catch (error) {
       console.log(error);
     }
   },
 };
 
-const category = {
+const product = {
   namespaced: true,
   state,
   getters,
@@ -149,4 +149,4 @@ const category = {
   actions,
 };
 
-export default category;
+export default product;
