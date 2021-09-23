@@ -30,6 +30,10 @@ import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 Vue.use(VueSweetalert2);
 
+Vue.filter("formatRupiah", (value) => {
+  return new Intl.NumberFormat("id-ID").format(value);
+});
+
 //store module
 import store from "./store";
 

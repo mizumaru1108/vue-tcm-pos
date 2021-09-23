@@ -12,9 +12,14 @@
         <!-- field filter -->
         <div class="flex py-1">
           <div class="relative flex w-full flex-wrap items-stretch pr-1">
-            <t-input v-model="filter" placeholder="Search Here" />
+            <t-input
+              v-model="filter"
+              @keyup.enter="onSearch"
+              placeholder="Search Here"
+            />
             <span
               v-if="!!filter"
+              @click="clearSearch"
               class="text-center absolute bg-transparent text-base items-center justify-center right-0 pr-2 py-2 text-gray-400"
             >
               <close-thick></close-thick>
@@ -23,6 +28,7 @@
 
           <div class="pr-1">
             <button
+              @click="onSearch"
               class="py-2 px-3 bg-blue-500 rounded-md text-white focus:shadow-outline-none focus:shadow-xl"
             >
               <magnify></magnify>
@@ -74,7 +80,10 @@
       </div>
 
       <!-- field modal add kategori -->
-      <t-modal v-model="formModal" header="Manage Category">
+      <t-modal v-model="formModal">
+        <template v-slot:header>
+          {{ selectedAction == "create" ? "Create Product" : "Edit Detail" }}
+        </template>
         <div>
           <label for="">Nama Kategori</label>
           <t-input v-model="categoryData.name" />
@@ -156,6 +165,20 @@ export default {
     mounted() {
       this.fetchData();
       this.clearError();
+    },
+
+    onSearch() {
+      this.currentPage = 1;
+      this.getAllCategoryList({
+        page: this.currentPage,
+        per_page: this.perPage,
+        filter: this.filter,
+      });
+    },
+
+    clearSearch() {
+      this.filter = "";
+      this.onSearch();
     },
 
     clearImage() {

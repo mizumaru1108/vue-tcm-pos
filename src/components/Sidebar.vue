@@ -34,7 +34,7 @@
         </router-link>
 
         <router-link
-          to="/transaction"
+          to="/transactions"
           exact
           exact-active-class="bg-green-300"
           class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-green-300 rounded-lg cursor-pointer"

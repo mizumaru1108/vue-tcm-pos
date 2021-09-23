@@ -129,7 +129,7 @@ const actions = {
     }
   },
 
-  async category(context) {
+  async getAllCategory(context) {
     try {
       const response = await axios.get(
         `${process.env.VUE_APP_BASE_URL}/api/categories`

@@ -6,6 +6,8 @@ Vue.use(Vuex);
 import login from "./module/login.module";
 import user from "./module/user.module";
 import category from "./module/category.module";
+import product from "./module/product.module";
+import order from "./module/order.module";
 
 import createPersistedState from "vuex-persistedstate";
 
@@ -32,6 +34,8 @@ export default new Vuex.Store({
     login,
     user,
     category,
+    product,
+    order,
   },
   plugins: [
     createPersistedState({

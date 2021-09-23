@@ -36,7 +36,29 @@ const routes = [
       needAuth: true,
     },
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Products/Category.vue"),
+      import(/* webpackChunkName: "about" */ "../views/Category/Category.vue"),
+  },
+  {
+    path: "/transactions",
+    name: "Transactions",
+    meta: {
+      needAuth: true,
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "../views/Transaction/Transaction.vue"
+      ),
+  },
+  {
+    path: "/transaction/:id",
+    name: "TransactionDetail",
+    meta: {
+      needAuth: true,
+    },
+    component: () =>
+      import(
+        /* webpackChunkName: "JobVacancies" */ "../views/Transaction/TransactionDetail.vue"
+      ),
   },
 ];
 
