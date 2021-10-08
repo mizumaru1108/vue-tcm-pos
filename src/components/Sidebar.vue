@@ -70,60 +70,10 @@
             </span>
             <span class="text-gray-700">Kelola Kategori</span>
           </router-link>
-
-          <router-link
-            to="/category"
-            exact
-            exact-active-class="bg-green-300"
-            class="w-full flex items-center text-blue-400 h-10 hover:bg-green-300 rounded-lg cursor-pointer"
-          >
-            <span class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
-              <nametag></nametag>
-            </span>
-            <span class="text-gray-700">Pesan PDH/PDU</span>
-          </router-link>
-
-          <router-link
-            to="/category"
-            exact
-            exact-active-class="bg-green-300"
-            class="w-full flex items-center text-blue-400 h-10 hover:bg-green-300 rounded-lg cursor-pointer"
-          >
-            <span class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
-              <clipboardList></clipboardList>
-            </span>
-            <span class="text-gray-700">Pesan Lainnya</span>
-          </router-link>
-        </div>
-
-        <div class="px-4">
-          <p class="text-sm font-semibold">Rizki Bordir</p>
-          <router-link
-            to="/transaction-report"
-            exact
-            exact-active-class="bg-green-300"
-            class="w-full flex items-center text-blue-400 h-10 hover:bg-green-300 rounded-lg cursor-pointer"
-          >
-            <span class="h-6 w-6 fill-current mr-2">
-              <clipboardList></clipboardList>
-            </span>
-            <span class="text-gray-700">Order</span>
-          </router-link>
         </div>
 
         <div class="px-4">
           <p class="text-sm font-semibold">Kelola Laporan</p>
-          <router-link
-            to="/employees-report"
-            exact
-            exact-active-class="bg-green-300"
-            class="w-full flex items-center text-blue-400 h-10 hover:bg-green-300 rounded-lg cursor-pointer"
-          >
-            <span class="h-6 w-6 fill-current mr-2">
-              <clipboardPulse></clipboardPulse>
-            </span>
-            <span class="text-gray-700">Status </span>
-          </router-link>
 
           <router-link
             to="/transaction-report"
@@ -143,32 +93,28 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import cartVariant from "vue-material-design-icons/CartVariant";
-import viewDashboard from "vue-material-design-icons/ViewDashboard";
-import warehouse from "vue-material-design-icons/Warehouse";
-import accountSupervisorCircle from "vue-material-design-icons/AccountSupervisorCircle";
-import clipboardPulse from "vue-material-design-icons/ClipboardPulse";
-import clipboardList from "vue-material-design-icons/ClipboardList";
-import nametag from "vue-material-design-icons/BadgeAccountHorizontalOutline";
-export default {
-  name: "Sidebar",
-  components: {
-    cartVariant,
-    viewDashboard,
-    warehouse,
-    accountSupervisorCircle,
-    clipboardPulse,
-    clipboardList,
-    nametag,
-  },
-  computed: {
-    ...mapState(["sideBarOpen"]),
-  },
-  data() {
-    return {
-      menu: [],
-    };
-  },
-};
+  import { mapState } from "vuex"
+  import cartVariant from "vue-material-design-icons/CartVariant"
+  import viewDashboard from "vue-material-design-icons/ViewDashboard"
+  import warehouse from "vue-material-design-icons/Warehouse"
+  import accountSupervisorCircle from "vue-material-design-icons/AccountSupervisorCircle"
+  import clipboardPulse from "vue-material-design-icons/ClipboardPulse"
+  export default {
+    name: "Sidebar",
+    components: {
+      cartVariant,
+      viewDashboard,
+      warehouse,
+      accountSupervisorCircle,
+      clipboardPulse,
+    },
+    computed: {
+      ...mapState(["sideBarOpen"]),
+    },
+    data() {
+      return {
+        menu: [],
+      }
+    },
+  }
 </script>

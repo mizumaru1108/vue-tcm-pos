@@ -158,116 +158,115 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
-import DashboardLayouts from "../../components/DashboardLayouts.vue";
+  import { mapActions, mapState } from "vuex"
+  import DashboardLayouts from "../../components/DashboardLayouts.vue"
 
-export default {
-  name: "Categories",
-  components: {
-    DashboardLayouts,
-  },
-  data() {
-    return {
-      date: "",
-      openTab: 1,
-      status: 1,
-      headers: [
-        {
-          value: "created_at",
-          text: "Tanggal",
-        },
-        {
-          value: "order_number",
-          text: "order_number",
-        },
-        {
-          value: "order_code",
-          text: "order_code",
-        },
-        {
-          value: "status",
-          text: "Status",
-        },
-        {
-          value: "total_price",
-          text: "Harga",
-        },
-      ],
-    };
-  },
-  computed: {
-    ...mapState("order", ["orderList"]),
-    check() {
-      return this.date;
+  export default {
+    components: {
+      DashboardLayouts,
     },
-  },
-  watch: {
-    check(date) {
-      if (date == "") {
-        this.fetchData();
+    data() {
+      return {
+        date: "",
+        openTab: 1,
+        status: 1,
+        headers: [
+          {
+            value: "created_at",
+            text: "Tanggal",
+          },
+          {
+            value: "order_number",
+            text: "order_number",
+          },
+          {
+            value: "order_code",
+            text: "order_code",
+          },
+          {
+            value: "status",
+            text: "Status",
+          },
+          {
+            value: "total_price",
+            text: "Harga",
+          },
+        ],
       }
     },
-  },
-
-  mounted() {
-    this.fetchData();
-  },
-  methods: {
-    ...mapActions("order", {
-      getAllOrderList: "getAllOrderList",
-      createOrder: "createOrder",
-      getUnfinishTrans: "getUnfinishTrans",
-    }),
-
-    fetchData() {
-      this.getAllOrderList({ status: this.status });
+    computed: {
+      ...mapState("order", ["orderList"]),
+      check() {
+        return this.date
+      },
     },
-
-    onDateChange() {
-      if (this.date) {
-        if (this.date.length == 1) {
-          this.getAllOrderList({
-            fromdate: this.date[0],
-          });
+    watch: {
+      check(date) {
+        if (date == "") {
+          this.fetchData()
         }
-        if (this.date.length > 1) {
-          this.getAllOrderList({
-            fromdate: this.date[0],
-            todate: this.date[1],
-          });
+      },
+    },
+
+    mounted() {
+      this.fetchData()
+    },
+    methods: {
+      ...mapActions("order", {
+        getAllOrderList: "getAllOrderList",
+        createOrder: "createOrder",
+        getUnfinishTrans: "getUnfinishTrans",
+      }),
+
+      fetchData() {
+        this.getAllOrderList({ status: this.status })
+      },
+
+      onDateChange() {
+        if (this.date) {
+          if (this.date.length == 1) {
+            this.getAllOrderList({
+              fromdate: this.date[0],
+            })
+          }
+          if (this.date.length > 1) {
+            this.getAllOrderList({
+              fromdate: this.date[0],
+              todate: this.date[1],
+            })
+          }
         }
-      }
-    },
+      },
 
-    toggleTabs: function(tabNumber) {
-      this.openTab = tabNumber;
-      if (this.openTab == 1) {
-        this.status = 1;
-        this.getUnfinishTrans();
-      } else {
-        this.status = 2;
-      }
-      this.getAllOrderList({
-        status: this.status,
-      });
-    },
+      toggleTabs: function(tabNumber) {
+        this.openTab = tabNumber
+        if (this.openTab == 1) {
+          this.status = 1
+          this.getUnfinishTrans()
+        } else {
+          this.status = 2
+        }
+        this.getAllOrderList({
+          status: this.status,
+        })
+      },
 
-    async onCreateOrder() {
-      await this.createOrder();
-      await this.getAllOrderList();
-      await this.getUnfinishTrans();
-    },
+      async onCreateOrder() {
+        await this.createOrder()
+        await this.getAllOrderList()
+        await this.getUnfinishTrans()
+      },
 
-    onSelectRow(row) {
-      if (row.status == 1) {
-        this.$router.push({
-          name: "TransactionDetail",
-          params: { id: row.id },
-        });
-      } else {
-        this.$router.push("/transaction-report");
-      }
+      onSelectRow(row) {
+        if (row.status == 1) {
+          this.$router.push({
+            name: "TransactionDetail",
+            params: { id: row.id },
+          })
+        } else {
+          this.$router.push("/transaction-report")
+        }
+      },
     },
-  },
-};
+  }
 </script>

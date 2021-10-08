@@ -37,6 +37,8 @@ const actions = {
   async getAllProductList(
     context,
     { page, per_page, filter } = {
+      page: 1,
+      per_page: null,
       filter: "",
     }
   ) {
@@ -56,7 +58,16 @@ const actions = {
       )
       context.commit("setProductList", response.data)
     } catch (error) {
-      console.error(error)
+      let errorMessage = ""
+      if (error.response) {
+        errorMessage = error.response.data.message
+      }
+      if (error.response.status >= 400) {
+        console.error("masuk error", error.response)
+        context.commit("setError", error.response.data)
+        throw new Error(errorMessage)
+      }
+      return error.message
     }
   },
 
@@ -98,7 +109,7 @@ const actions = {
 
   async updateProduct(context, { id, payload }) {
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `${process.env.VUE_APP_BASE_URL}/api/product/${id}`,
         payload
       )

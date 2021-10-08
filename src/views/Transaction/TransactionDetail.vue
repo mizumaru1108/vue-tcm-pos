@@ -289,237 +289,237 @@
   </dashboard-layouts>
 </template>
 <style>
-@media print {
-  .no-print,
-  .no-print * {
-    display: none !important;
+  @media print {
+    .no-print,
+    .no-print * {
+      display: none !important;
+    }
   }
-}
 </style>
 <script>
-import DashboardLayouts from "../../components/DashboardLayouts.vue";
-import { mapActions, mapState, mapMutations } from "vuex";
-import { mapMultiRowFields } from "vuex-map-fields";
-import IconPlus from "vue-material-design-icons/Plus";
-import IconMinus from "vue-material-design-icons/Minus";
-import cartVariant from "vue-material-design-icons/CartVariant";
-export default {
-  components: { DashboardLayouts, IconPlus, IconMinus, cartVariant },
-  computed: {
-    ...mapState("product", ["productList"]),
-    ...mapMultiRowFields("order", ["orderData.details"]),
-    ...mapState("order", ["orderData"]),
-    filteredItem() {
-      return this.productProduct.filter((value) => {
-        return value.name
-          .toLowerCase()
-          .includes(this.searchProduct.toLowerCase());
-      });
+  import DashboardLayouts from "../../components/DashboardLayouts.vue"
+  import { mapActions, mapState, mapMutations } from "vuex"
+  import { mapMultiRowFields } from "vuex-map-fields"
+  import IconPlus from "vue-material-design-icons/Plus"
+  import IconMinus from "vue-material-design-icons/Minus"
+  import cartVariant from "vue-material-design-icons/CartVariant"
+  export default {
+    components: { DashboardLayouts, IconPlus, IconMinus, cartVariant },
+    computed: {
+      ...mapState("product", ["productList"]),
+      ...mapMultiRowFields("order", ["orderData.details"]),
+      ...mapState("order", ["orderData"]),
+      filteredItem() {
+        return this.productProduct.filter((value) => {
+          return value.name
+            .toLowerCase()
+            .includes(this.searchProduct.toLowerCase())
+        })
+      },
     },
-  },
-  data() {
-    return {
-      receiptModal: null,
-      discount: 0,
-      changeDiscount: false,
-      id: this.$route.params.id,
-      searchProduct: "",
-      subTotal: 0,
-      subTotalItemQty: 0,
-      finalTotal: 0,
-      totalDiscount: 0,
-      change: 0,
-      cash: null,
-      minus: false,
-      filteredList: [],
-      productProduct: [],
-      headers: [
-        {
-          value: "name",
-          text: "Name",
-        },
-        {
-          value: "qty",
-          text: "Qty",
-        },
-        {
-          value: "subtotal",
-          text: "Subtotal",
-        },
-      ],
-    };
-  },
-  async onIdle() {
-    await this.syncData();
-  },
-
-  async mounted() {
-    await this.fetchData();
-    await this.countTransaction();
-  },
-
-  async beforeDestroy() {
-    await this.syncData();
-  },
-
-  methods: {
-    ...mapActions("product", ["getAllProductList"]),
-    ...mapActions("order", ["getOrder", "updateOrder", "getAllOrderList"]),
-    ...mapMutations("order", ["addSelectedProduct", "removeSelectedProduct"]),
-
-    async syncData() {
-      await this.updateOrder({ id: this.id, payload: this.orderData });
-    },
-
-    openReceiptModal() {
-      this.receiptModal = true;
-    },
-
-    closeReceiptModal() {
-      this.receiptModal = false;
-    },
-
-    async withoutReceipt() {
-      this.orderData.checkout = true;
-      this.updateOrder({ id: this.id, payload: this.orderData });
-      this.$router.push("/transaction");
-      await this.$toast.success("Transaction success!");
-    },
-
-    async withReceipt() {
-      await this.printReceipt();
-    },
-
-    async printReceipt() {
-      let printContent = this.$refs.printReceipt.innerHTML;
-      const printArea = document.getElementById("printArea");
-      printArea.innerHTML = printContent;
-      window.print();
-      printArea.innerHTML = "";
-
-      this.orderData.checkout = true;
-      this.updateOrder({ id: this.id, payload: this.orderData });
-      this.$router.push("/transaction");
-      await this.$toast.success("Transaction success!");
-    },
-
-    async onMove() {
-      await this.syncData();
-      this.$router.push("/transaction");
-      this.$toast.success("List Updated!");
-    },
-
-    countTransaction() {
-      this.subTotal = 0;
-      this.subTotalItemQty = 0;
-      this.totalDiscount = 0;
-      this.finalTotal = 0;
-
-      this.details.forEach((value) => {
-        this.subTotal += parseInt(value.total_price);
-        this.subTotalItemQty += parseInt(value.qty);
-      });
-      this.totalDiscount = (this.subTotal * this.discount) / 100;
-      this.orderData.discount_value = this.totalDiscount;
-      this.orderData.discount_percentage = this.discount;
-      this.finalTotal = this.subTotal - this.totalDiscount;
-      this.change = this.cash - this.finalTotal;
-    },
-
-    onCashChange() {
-      this.change = this.cash - this.finalTotal;
-      if (this.cash < this.finalTotal) {
-        this.minus = true;
-      } else {
-        this.minus = false;
+    data() {
+      return {
+        receiptModal: null,
+        discount: 0,
+        changeDiscount: false,
+        id: this.$route.params.id,
+        searchProduct: "",
+        subTotal: 0,
+        subTotalItemQty: 0,
+        finalTotal: 0,
+        totalDiscount: 0,
+        change: 0,
+        cash: null,
+        minus: false,
+        filteredList: [],
+        productProduct: [],
+        headers: [
+          {
+            value: "name",
+            text: "Name",
+          },
+          {
+            value: "qty",
+            text: "Qty",
+          },
+          {
+            value: "subtotal",
+            text: "Subtotal",
+          },
+        ],
       }
-      this.orderData.cash = this.cash;
-      this.orderData.change = this.change;
+    },
+    async onIdle() {
+      await this.syncData()
     },
 
-    async fetchData() {
-      await this.getAllProductList();
-      this.productProduct = this.productList.data.map((value) => {
-        return {
-          product_id: value.id,
-          image_url: value.image_url,
-          name: value.name,
-          price: value.price,
-          qty: value.qty,
-          slug: value.slug,
-          total_price: value.total_price,
-        };
-      });
-      await this.getOrder({ id: this.id });
+    async mounted() {
+      await this.fetchData()
+      await this.countTransaction()
     },
 
-    onChangeDiscount() {
-      this.changeDiscount = !this.changeDiscount;
+    async beforeDestroy() {
+      await this.syncData()
     },
 
-    onSelectProduct(id) {
-      let findProduct = this.productProduct.find(
-        (value) => value.product_id === id
-      );
-      let checkExists = this.details.some((value) => value.product_id === id);
-      if (checkExists) {
-        let findIndex = this.details.findIndex(
+    methods: {
+      ...mapActions("product", ["getAllProductList"]),
+      ...mapActions("order", ["getOrder", "updateOrder", "getAllOrderList"]),
+      ...mapMutations("order", ["addSelectedProduct", "removeSelectedProduct"]),
+
+      async syncData() {
+        await this.updateOrder({ id: this.id, payload: this.orderData })
+      },
+
+      openReceiptModal() {
+        this.receiptModal = true
+      },
+
+      closeReceiptModal() {
+        this.receiptModal = false
+      },
+
+      async withoutReceipt() {
+        this.orderData.checkout = true
+        this.updateOrder({ id: this.id, payload: this.orderData })
+        this.$router.push("/transactions")
+        await this.$toast.success("Transaction success!")
+      },
+
+      async withReceipt() {
+        await this.printReceipt()
+      },
+
+      async printReceipt() {
+        let printContent = this.$refs.printReceipt.innerHTML
+        const printArea = document.getElementById("printArea")
+        printArea.innerHTML = printContent
+        window.print()
+        printArea.innerHTML = ""
+
+        this.orderData.checkout = true
+        this.updateOrder({ id: this.id, payload: this.orderData })
+        this.$router.push("/transactions")
+        await this.$toast.success("Transaction success!")
+      },
+
+      async onMove() {
+        await this.syncData()
+        this.$router.push("/transaction")
+        this.$toast.success("List Updated!")
+      },
+
+      countTransaction() {
+        this.subTotal = 0
+        this.subTotalItemQty = 0
+        this.totalDiscount = 0
+        this.finalTotal = 0
+
+        this.details.forEach((value) => {
+          this.subTotal += parseInt(value.total_price)
+          this.subTotalItemQty += parseInt(value.qty)
+        })
+        this.totalDiscount = (this.subTotal * this.discount) / 100
+        this.orderData.discount_value = this.totalDiscount
+        this.orderData.discount_percentage = this.discount
+        this.finalTotal = this.subTotal - this.totalDiscount
+        this.change = this.cash - this.finalTotal
+      },
+
+      onCashChange() {
+        this.change = this.cash - this.finalTotal
+        if (this.cash < this.finalTotal) {
+          this.minus = true
+        } else {
+          this.minus = false
+        }
+        this.orderData.cash = this.cash
+        this.orderData.change = this.change
+      },
+
+      async fetchData() {
+        await this.getAllProductList()
+        this.productProduct = this.productList.data.map((value) => {
+          return {
+            product_id: value.id,
+            image_url: value.image_url,
+            name: value.name,
+            price: value.price,
+            qty: value.qty,
+            slug: value.slug,
+            total_price: value.total_price,
+          }
+        })
+        await this.getOrder({ id: this.id })
+      },
+
+      onChangeDiscount() {
+        this.changeDiscount = !this.changeDiscount
+      },
+
+      onSelectProduct(id) {
+        let findProduct = this.productProduct.find(
           (value) => value.product_id === id
-        );
-        let qty = this.details[findIndex].qty;
+        )
+        let checkExists = this.details.some((value) => value.product_id === id)
+        if (checkExists) {
+          let findIndex = this.details.findIndex(
+            (value) => value.product_id === id
+          )
+          let qty = this.details[findIndex].qty
 
-        this.details[findIndex].qty = qty + 1;
-        this.details[findIndex].total_price = (qty + 1) * findProduct.price;
-      } else {
-        findProduct.qty = 1;
-        findProduct.total_price = findProduct.price;
-        let pushData = Object.assign({}, findProduct);
-        this.addSelectedProduct(pushData);
-      }
-      this.countTransaction();
-    },
+          this.details[findIndex].qty = qty + 1
+          this.details[findIndex].total_price = (qty + 1) * findProduct.price
+        } else {
+          findProduct.qty = 1
+          findProduct.total_price = findProduct.price
+          let pushData = Object.assign({}, findProduct)
+          this.addSelectedProduct(pushData)
+        }
+        this.countTransaction()
+      },
 
-    onPlus(id, paramHarga) {
-      const price = paramHarga;
-      let currentIndex = this.details.findIndex(
-        (value) => value.product_id === id
-      );
-      let qty = this.details[currentIndex].qty;
-      this.details[currentIndex].qty += 1;
-      this.details[currentIndex].total_price = (qty + 1) * price;
-      this.countTransaction();
-    },
+      onPlus(id, paramHarga) {
+        const price = paramHarga
+        let currentIndex = this.details.findIndex(
+          (value) => value.product_id === id
+        )
+        let qty = this.details[currentIndex].qty
+        this.details[currentIndex].qty += 1
+        this.details[currentIndex].total_price = (qty + 1) * price
+        this.countTransaction()
+      },
 
-    onChangeQty(id, paramHarga) {
-      const price = paramHarga;
-      let currentIndex = this.details.findIndex(
-        (value) => value.product_id === id
-      );
-      let qty = this.details[currentIndex].qty;
-      this.details[currentIndex].total_price = qty * price;
-      this.countTransaction();
-    },
+      onChangeQty(id, paramHarga) {
+        const price = paramHarga
+        let currentIndex = this.details.findIndex(
+          (value) => value.product_id === id
+        )
+        let qty = this.details[currentIndex].qty
+        this.details[currentIndex].total_price = qty * price
+        this.countTransaction()
+      },
 
-    onMin(id, paramHarga) {
-      const price = paramHarga;
-      let currentIndex = this.details.findIndex(
-        (value) => value.product_id === id
-      );
-      let qty = this.details[currentIndex].qty;
-      if (qty > 1) {
-        this.details[currentIndex].qty -= 1;
-        this.details[currentIndex].total_price = (qty - 1) * price;
-      } else {
-        this.removeSelectedProduct(id);
-      }
-      this.countTransaction();
-    },
+      onMin(id, paramHarga) {
+        const price = paramHarga
+        let currentIndex = this.details.findIndex(
+          (value) => value.product_id === id
+        )
+        let qty = this.details[currentIndex].qty
+        if (qty > 1) {
+          this.details[currentIndex].qty -= 1
+          this.details[currentIndex].total_price = (qty - 1) * price
+        } else {
+          this.removeSelectedProduct(id)
+        }
+        this.countTransaction()
+      },
 
-    filterItem() {
-      this.filteredList = this.productProduct.filter((value) => {
-        return value.name.toLowerCase() === this.searchProduct.toLowerCase();
-      });
+      filterItem() {
+        this.filteredList = this.productProduct.filter((value) => {
+          return value.name.toLowerCase() === this.searchProduct.toLowerCase()
+        })
+      },
     },
-  },
-};
+  }
 </script>
