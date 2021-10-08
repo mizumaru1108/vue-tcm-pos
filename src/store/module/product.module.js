@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "axios"
 const state = {
   productList: {
     data: [],
@@ -8,30 +8,30 @@ const state = {
   errorData: {
     errors: [],
   },
-};
-const getters = {};
+}
+const getters = {}
 const mutations = {
   setProductList(state, payload) {
-    state.productList = payload;
+    state.productList = payload
   },
   setProduct(state, payload) {
-    state.productData = payload;
+    state.productData = payload
   },
   setShowAllProduct(state, payload) {
-    state.allProduct = payload;
+    state.allProduct = payload
   },
   setError(state, payload) {
-    state.errorData = payload;
+    state.errorData = payload
   },
-};
+}
 const actions = {
   clearError(context) {
     const payload = {
       errorData: {
         errors: [],
       },
-    };
-    context.commit("setError", payload);
+    }
+    context.commit("setError", payload)
   },
 
   async getAllProductList(
@@ -41,22 +41,22 @@ const actions = {
     }
   ) {
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams()
       if (page != null) {
-        params.append("page", page);
+        params.append("page", page)
       }
       if (per_page != null) {
-        params.append("per_page", per_page);
+        params.append("per_page", per_page)
       }
       if (filter != null && filter != "") {
-        params.append("filter", filter);
+        params.append("filter", filter)
       }
       const response = await axios.get(
         `${process.env.VUE_APP_BASE_URL}/api/product?${params}`
-      );
-      context.commit("setProductList", response.data);
+      )
+      context.commit("setProductList", response.data)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   },
 
@@ -64,15 +64,15 @@ const actions = {
     try {
       const response = await axios.get(
         `${process.env.VUE_APP_BASE_URL}/api/product/${id}`
-      );
-      context.commit("setProduct", response.data.data);
+      )
+      context.commit("setProduct", response.data.data)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   },
 
   clearProduct(context) {
-    context.commit("setProduct", {});
+    context.commit("setProduct", {})
   },
 
   async createProduct(context, { payload }) {
@@ -80,19 +80,19 @@ const actions = {
       const response = await axios.post(
         `${process.env.VUE_APP_BASE_URL}/api/product`,
         payload
-      );
-      context.dispatch("clearProduct");
-      return response.data;
+      )
+      context.dispatch("clearProduct")
+      return response.data
     } catch (error) {
-      let errorMessage = "";
+      let errorMessage = ""
       if (error.response) {
-        errorMessage = error.response.data.message;
+        errorMessage = error.response.data.zssage
       }
       if (error.response.status >= 400) {
-        context.commit("setError", error.response.data);
-        throw new Error(errorMessage);
+        context.commit("setError", error.response.data)
+        throw new Error(errorMessage)
       }
-      return error.message;
+      return error.message
     }
   },
 
@@ -101,19 +101,19 @@ const actions = {
       const response = await axios.put(
         `${process.env.VUE_APP_BASE_URL}/api/product/${id}`,
         payload
-      );
-      context.dispatch("clearProduct");
-      return response.data;
+      )
+      context.dispatch("clearProduct")
+      return response.data
     } catch (error) {
-      let errorMessage = "";
+      let errorMessage = ""
       if (error.response) {
-        errorMessage = error.response.data.message;
+        errorMessage = error.response.data.message
       }
       if (error.response.status >= 400) {
-        context.commit("setError", error.response.data);
-        throw new Error(errorMessage);
+        context.commit("setError", error.response.data)
+        throw new Error(errorMessage)
       }
-      return error.message;
+      return error.message
     }
   },
 
@@ -121,11 +121,11 @@ const actions = {
     try {
       const response = await axios.delete(
         `${process.env.VUE_APP_BASE_URL}/api/product/${id}`
-      );
+      )
 
-      return response.data;
+      return response.data
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   },
 
@@ -133,13 +133,13 @@ const actions = {
     try {
       const response = await axios.get(
         `${process.env.VUE_APP_BASE_URL}/api/products`
-      );
-      context.commit("setShowAllProduct", response.data.data);
+      )
+      context.commit("setShowAllProduct", response.data.data)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   },
-};
+}
 
 const product = {
   namespaced: true,
@@ -147,6 +147,6 @@ const product = {
   getters,
   mutations,
   actions,
-};
+}
 
-export default product;
+export default product
