@@ -1,6 +1,7 @@
 import axios from "axios";
 const state = {
   userList: [],
+  roleList: [],
   userData: {},
   errorData: {
     errors: [],
@@ -11,7 +12,9 @@ const mutations = {
   setUserList(state, payload) {
     state.userList = payload;
   },
-
+  setRoleList(state, payload) {
+    state.roleList = payload;
+  },
   setUser(state, payload) {
     state.userData = payload;
   },
@@ -29,10 +32,20 @@ const actions = {
     context.commit("setError", payload);
   },
 
-  async getAllUserList(context) {
+  async getAllUserList(
+    context,
+    { filter, privileges } = { filter: "", privileges: "All" }
+  ) {
     try {
+      const params = new URLSearchParams();
+      if (filter != null && filter != "") {
+        params.append("filter", filter);
+      }
+      if (privileges != "All") {
+        params.append("privileges", privileges);
+      }
       const response = await axios.get(
-        `${process.env.VUE_APP_BASE_URL}/api/user`
+        `${process.env.VUE_APP_BASE_URL}/api/user?${params}`
       );
       context.commit("setUserList", response.data);
     } catch (error) {
@@ -109,6 +122,16 @@ const actions = {
       return response.data;
     } catch (error) {
       console.log(error);
+    }
+  },
+  async getAllRoles(context) {
+    try {
+      const response = await axios.get(
+        `${process.env.VUE_APP_BASE_URL}/api/roles`
+      );
+      context.commit("setRoleList", response.data.roles);
+    } catch (error) {
+      console.error(error);
     }
   },
 };

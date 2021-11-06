@@ -93,28 +93,28 @@
 </template>
 
 <script>
-  import { mapState } from "vuex"
-  import cartVariant from "vue-material-design-icons/CartVariant"
-  import viewDashboard from "vue-material-design-icons/ViewDashboard"
-  import warehouse from "vue-material-design-icons/Warehouse"
-  import accountSupervisorCircle from "vue-material-design-icons/AccountSupervisorCircle"
-  import clipboardPulse from "vue-material-design-icons/ClipboardPulse"
-  export default {
-    name: "Sidebar",
-    components: {
-      cartVariant,
-      viewDashboard,
-      warehouse,
-      accountSupervisorCircle,
-      clipboardPulse,
-    },
-    computed: {
-      ...mapState(["sideBarOpen"]),
-    },
-    data() {
-      return {
-        menu: [],
-      }
-    },
-  }
+import { mapState } from "vuex";
+import cartVariant from "vue-material-design-icons/CartVariant";
+import viewDashboard from "vue-material-design-icons/ViewDashboard";
+import warehouse from "vue-material-design-icons/Warehouse";
+import accountSupervisorCircle from "vue-material-design-icons/AccountSupervisorCircle";
+import clipboardPulse from "vue-material-design-icons/ClipboardPulse";
+export default {
+  name: "Sidebar",
+  components: {
+    cartVariant,
+    viewDashboard,
+    warehouse,
+    accountSupervisorCircle,
+    clipboardPulse,
+  },
+  computed: {
+    ...mapState(["sideBarOpen"]),
+  },
+  data() {
+    return {
+      menu: [],
+    };
+  },
+};
 </script>
