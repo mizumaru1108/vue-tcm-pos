@@ -21,17 +21,19 @@
           <span class="text-gray-700 pl-2 bordercustom">Dashboard</span>
         </router-link>
 
-        <router-link
-          to="/account"
-          exact
-          exact-active-class="bg-green-300"
-          class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-green-300 rounded-lg cursor-pointer"
-        >
-          <span class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
-            <accountSupervisorCircle></accountSupervisorCircle>
-          </span>
-          <span class="text-gray-700">Kelola Akun</span>
-        </router-link>
+        <div v-if="profile.roles == 'admin'">
+          <router-link
+            to="/account"
+            exact
+            exact-active-class="bg-green-300"
+            class="w-full flex items-center text-blue-400 h-10 pl-4 hover:bg-green-300 rounded-lg cursor-pointer"
+          >
+            <span class="h-6 w-6 fill-current mr-2" viewBox="0 0 20 20">
+              <accountSupervisorCircle></accountSupervisorCircle>
+            </span>
+            <span class="text-gray-700">Kelola Akun</span>
+          </router-link>
+        </div>
 
         <router-link
           to="/transactions"
@@ -93,7 +95,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import cartVariant from "vue-material-design-icons/CartVariant";
 import viewDashboard from "vue-material-design-icons/ViewDashboard";
 import warehouse from "vue-material-design-icons/Warehouse";
@@ -110,11 +112,33 @@ export default {
   },
   computed: {
     ...mapState(["sideBarOpen"]),
+    ...mapState("login", ["profile"]),
+    ...mapState("order", ["unfinishTrans"]),
   },
   data() {
     return {
       menu: [],
     };
+  },
+  async mounted() {
+    await this.getUnfinishTrans();
+    this.unfinish = this.unfinishTrans;
+  },
+  watch: {
+    unfinishTrans(newVal) {
+      this.unfinish = newVal;
+    },
+  },
+  methods: {
+    ...mapActions("login", ["handleLogOut"]),
+    ...mapActions("order", ["getUnfinishTrans"]),
+    toggleSidebar() {
+      this.$store.dispatch("toggleSidebar");
+    },
+    async onLogout() {
+      await this.handleLogOut();
+      await this.$router.push("/login");
+    },
   },
 };
 </script>

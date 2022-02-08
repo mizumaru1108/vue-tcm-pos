@@ -22,7 +22,7 @@
     <!-- Page Header -->
     <div class="flex justify-center text-center flex-col">
       <img class="h-12 w-12 mx-auto" src="~@/assets/small_ico.jpg" alt="logo" />
-      <span class="text-xl">Wisata Kopi</span>
+      <span class="text-xl">Toko Commando Military</span>
 
       <!-- Label -->
       <span class="text-md" v-if="exportData.label != 'Yearly'"

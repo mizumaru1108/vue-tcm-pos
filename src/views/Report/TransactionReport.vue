@@ -267,7 +267,7 @@
               src="~@/assets/small_ico.jpg"
               alt="logo"
             />
-            <div class="text-xl">Wisata Kopi</div>
+            <div class="text-xl">Toko Commando Military</div>
             <span class="text-md">{{ orderCode }}</span>
             <span class="text-sm">no antrian: {{ orderNumber }}</span>
             <div class="flex justify-between">
