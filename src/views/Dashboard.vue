@@ -13,7 +13,9 @@
                 <span class="text-sm">Daily Income</span>
                 <span class="text-sm"
                   >Rp.{{
-                    dashboardDailyReport.order_total | formatRupiah
+                    dashboardDailyReport.order_total
+                      ? dashboardDailyReport.order_total
+                      : '0'
                   }}</span
                 >
               </div>
@@ -29,8 +31,12 @@
               <div class="flex flex-col py-3 px-2">
                 <span class="text-sm">Daily Transacion</span>
                 <span class="text-sm"
-                  >{{ dashboardDailyReport.total_transaction }}x
-                  Transaction</span
+                  >{{
+                    dashboardDailyReport.total_transaction
+                      ? dashboardDailyReport.total_transaction
+                      : 0
+                  }}
+                  x Transaction</span
                 >
               </div>
             </div>
@@ -40,7 +46,7 @@
           <div class="w-full bg-white rounded-xl shadow px-4 py-3">
             <div class="flex justify-between pt-2">
               <span class="text-xl">Weekly Income </span>
-              <span class="text-xl">from {{ weeklyCount }}x Transactions</span>
+              <span class="text-xl">from {{ weeklyCount }} x Transactions</span>
             </div>
 
             <bar-chart
@@ -55,8 +61,13 @@
         <div class="bg-white rounded-xl shadow p-5 h-full">
           <div class="flex flex-col text-center">
             <span class="text-2xl pb-1">Yearly Income</span>
-            <span class="text-5xl pb-3"
-              >Rp. {{ dashboardYearlyReport.order_total | formatRupiah }},-
+            <span class="text-5xl pb-3">
+              Rp.
+              {{
+                dashboardYearlyReport.order_total
+                  ? dashboardYearlyReport.order_total
+                  : '0'
+              }},-
             </span>
             <span class="text-md text-gray-500 pb-5"
               >{{ dashboardYearlyReport.first_trans }} -
@@ -94,7 +105,7 @@
                     <div class="flex flex-row text-xs">
                       <span> Total:{{ recent.order_total }} </span>
                       <span>, Handled by:</span>
-                      <span> {{ " " + recent.employee.name }}</span>
+                      <span> {{ ' ' + recent.employee.name }}</span>
                     </div>
                   </div>
                 </div>
@@ -108,13 +119,13 @@
   </dashboard-layouts>
 </template>
 <script>
-import { mapActions, mapState } from "vuex";
-import BarChart from "../components/BarChart.vue";
-import DashboardLayouts from "../components/DashboardLayouts.vue";
-import SwapHorizontal from "vue-material-design-icons/SwapHorizontal";
+import { mapActions, mapState } from 'vuex';
+import BarChart from '../components/BarChart.vue';
+import DashboardLayouts from '../components/DashboardLayouts.vue';
+import SwapHorizontal from 'vue-material-design-icons/SwapHorizontal';
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
     DashboardLayouts,
     BarChart,
@@ -126,8 +137,8 @@ export default {
       labels: [],
       datasets: [
         {
-          label: "Data",
-          backgroundColor: "#94D2BD",
+          label: 'Data',
+          backgroundColor: '#94D2BD',
           data: [],
         },
       ],
@@ -151,11 +162,11 @@ export default {
     },
   }),
   computed: {
-    ...mapState("report", [
-      "dashboardDailyReport",
-      "dashboardWeeklyReport",
-      "dashboardYearlyReport",
-      "dashboardRecentTransaction",
+    ...mapState('report', [
+      'dashboardDailyReport',
+      'dashboardWeeklyReport',
+      'dashboardYearlyReport',
+      'dashboardRecentTransaction',
     ]),
   },
   async mounted() {
@@ -165,11 +176,11 @@ export default {
     this.getDashboardRecentTransaction();
   },
   methods: {
-    ...mapActions("report", [
-      "getDashboardDailyReport",
-      "getDashboardWeeklyReport",
-      "getDashboardYearlyReport",
-      "getDashboardRecentTransaction",
+    ...mapActions('report', [
+      'getDashboardDailyReport',
+      'getDashboardWeeklyReport',
+      'getDashboardYearlyReport',
+      'getDashboardRecentTransaction',
     ]),
 
     async fetchData() {
@@ -192,7 +203,7 @@ export default {
     },
 
     onMore() {
-      this.$router.push("/transaction-report");
+      this.$router.push('/transaction-report');
     },
   },
 };

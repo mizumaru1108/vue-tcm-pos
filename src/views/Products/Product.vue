@@ -60,6 +60,9 @@
                 <td :class="props.tdClass">
                   Rp.{{ props.row.price | formatRupiah }},-
                 </td>
+                <td :class="props.tdClass">
+                  {{ props.row.quantity ? props.row.quantity : 0 }}
+                </td>
                 <td :class="props.tdClass" class="flex flex-row">
                   <t-button
                     variant="editable"
@@ -89,18 +92,18 @@
           <t-modal v-model="formModal">
             <template v-slot:header>
               {{
-                selectedAction == "create" ? "Create Product" : "Edit Detail"
+                selectedAction == 'create' ? 'Create Product' : 'Edit Detail'
               }}
             </template>
 
             <div class="flex justify-center">
               <img
-                v-if="productData.image_url"
-                :src="productData.image_url"
-                class="h-40 w-72 max-w-xs max-h-40"
+                v-if="imageUrl || productData.image_url"
+                :src="imageUrl ? imageUrl : productData.image_url"
+                class="h-48 w-full max-w-full rounded-lg object-contain"
               />
             </div>
-            <div>
+            <div v-if="!imageUrl && !productData.image_url">
               <label for="">Picture</label>
               <label
                 class="w-full flex flex-col items-center px-1 py-1 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-blue-500"
@@ -118,30 +121,35 @@
                 <span class="mt-2 text-base leading-normal">{{
                   selectedImage != null && selectedImage.name
                     ? selectedImage.name
-                    : "Select File"
+                    : 'Select File'
                 }}</span>
                 <input type="file" class="hidden" @change="onFileChange" />
               </label>
-              <button
-                v-if="!!selectedImage"
-                class="block w-full rounded text-md text-white bg-red-500 px-4 py-1 transition duration-100 ease-in-out focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                @click="clearImage"
-              >
-                Remove Image
-              </button>
-              <span
-                class="text-sm text-left text-red-600"
-                v-if="errorData.errors && errorData.errors.image"
-              >
-                {{ errorData.errors.image[0] }}
-              </span>
             </div>
+
+            <button
+              v-if="!!imageUrl || !!productData.image_url"
+              class="block w-full rounded text-md text-white bg-red-500 px-4 py-1 transition duration-100 ease-in-out focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="clearImage"
+            >
+              Remove Image
+            </button>
+
+            <span
+              class="text-sm text-left text-red-600"
+              v-if="errorData.errors && errorData.errors.image"
+            >
+              {{ errorData.errors.image[0] }}
+            </span>
 
             <div>
               <label for="">Category</label>
               <t-select
                 v-model="productData.category_id"
-                :options="allCategory"
+                :options="[
+                  { id: '', name: 'Select a Category' },
+                  ...allCategory,
+                ]"
                 textAttribute="name"
                 valueAttribute="id"
               />
@@ -165,7 +173,12 @@
 
             <div>
               <label for="">Harga</label>
-              <t-input v-model="productData.price" />
+              <t-input
+                v-model.number="productData.price"
+                type="number"
+                min="0"
+                @input="validateNumber"
+              />
               <span
                 class="text-sm text-left text-red-600"
                 v-if="errorData.errors && errorData.errors.price"
@@ -173,17 +186,22 @@
                 {{ errorData.errors.price[0] }}
               </span>
             </div>
-
             <div>
-              <label for="">Jumlah</label>
-              <t-input v-model="productData.quantity" />
+              <label for="">Harga</label>
+              <t-input
+                v-model.number="productData.quantity"
+                type="number"
+                min="0"
+                @input="validateNumber"
+              />
               <span
                 class="text-sm text-left text-red-600"
-                v-if="errorData.errors && errorData.errors.quantitiy"
+                v-if="errorData.errors && errorData.errors.quantity"
               >
-                {{ errorData.errors.quantitiy[0] }}
+                {{ errorData.errors.quantity[0] }}
               </span>
             </div>
+
             <div>
               <label for="">Keterangan</label>
               <t-input v-model="productData.detail" />
@@ -196,19 +214,44 @@
             </div>
 
             <template v-slot:footer>
-              <div class="flex justify-between">
+              <div class="flex justify-between items-center">
                 <t-button @click="closeFormModal" type="button">
                   Cancel
                 </t-button>
-                <t-button
-                  @click="submitProduct"
-                  variant="editable"
-                  class="bg-custom-color2"
-                  :disabled="!!selectedImage && selectedImage.size > 2048000"
-                  type="button"
-                >
-                  Save
-                </t-button>
+                <div class="relative">
+                  <t-button
+                    v-if="!submitted"
+                    @click="submitProduct"
+                    variant="editable"
+                    class="bg-custom-color2"
+                    :disabled="!!selectedImage && selectedImage.size > 2048000"
+                    type="button"
+                  >
+                    Save
+                  </t-button>
+                  <div v-else class="flex items-center justify-center w-14">
+                    <svg
+                      class="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="#000"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="#000"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291l-2.938-2.938A7.963 7.963 0 014 12H0c0 4.42 3.134 8.064 7.291 8.938L6 17.291z"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
               </div>
             </template>
           </t-modal>
@@ -219,236 +262,315 @@
 </template>
 
 <script>
-  import DashboardLayouts from "../../components/DashboardLayouts.vue"
-  import { mapActions, mapState } from "vuex"
-  import IconPlus from "vue-material-design-icons/Plus"
-  import CloseThick from "vue-material-design-icons/CloseThick"
-  import Magnify from "vue-material-design-icons/Magnify"
-  export default {
-    components: { DashboardLayouts, IconPlus, CloseThick, Magnify },
-    name: "Products",
-    data() {
-      return {
-        filter: "",
-        formModal: false,
-        selectedId: null,
-        selectedImage: null,
-        selectedAction: "create",
-        currentPage: 1,
-        perPage: 7,
-        errors: {},
-        headers: [
-          {
-            value: "name",
-            text: "Nama",
-          },
-          {
-            value: "price",
-            text: "Price",
-          },
-          {
-            value: "actions",
-            text: "Actions",
-          },
-        ],
+import DashboardLayouts from '../../components/DashboardLayouts.vue';
+import { mapActions, mapState } from 'vuex';
+import IconPlus from 'vue-material-design-icons/Plus';
+import CloseThick from 'vue-material-design-icons/CloseThick';
+import Magnify from 'vue-material-design-icons/Magnify';
+export default {
+  components: { DashboardLayouts, IconPlus, CloseThick, Magnify },
+  name: 'Products',
+  data() {
+    return {
+      filter: '',
+      formModal: false,
+      selectedId: null,
+      selectedImage: null,
+      imageUrl: null,
+      submitted: false,
+      selectedAction: 'create',
+      currentPage: 1,
+      perPage: 7,
+      errors: {},
+      productData: {
+        category_id: null,
+      },
+      headers: [
+        {
+          value: 'name',
+          text: 'Nama',
+        },
+        {
+          value: 'price',
+          text: 'Price',
+        },
+        {
+          value: 'quantitiy',
+          text: 'Quantity',
+        },
+        {
+          value: 'actions',
+          text: 'Actions',
+        },
+      ],
+    };
+  },
+
+  computed: {
+    ...mapState('product', ['productList', 'productData', 'errorData']),
+    ...mapState('category', ['allCategory']),
+  },
+
+  mounted() {
+    this.fetchData();
+    this.clearError();
+  },
+
+  watch: {
+    currentPage(newVal) {
+      this.getAllProductList({
+        page: newVal,
+        per_page: this.perPage,
+        filter: this.filter,
+      });
+    },
+    perPage(newVal) {
+      this.getAllProductList({
+        page: this.currentPage,
+        per_page: newVal,
+        filter: this.filter,
+      });
+    },
+    productList(newVal) {
+      if (newVal.data.length == 0) {
+        this.$toast.error('Data not Found!', {
+          duration: 800,
+        });
+      }
+    },
+  },
+  methods: {
+    ...mapActions('product', [
+      'getAllProductList',
+      'getProduct',
+      'updateProduct',
+      'createProduct',
+      'deleteProduct',
+      'clearProduct',
+      'clearError',
+    ]),
+    ...mapActions('category', ['getAllCategory']),
+
+    clearImage() {
+      this.selectedImage = null;
+      this.imageUrl = null;
+    },
+
+    async onSearch() {
+      this.currentPage = 1;
+      await this.getAllProductList({
+        page: this.currentPage,
+        per_page: this.perPage,
+        filter: this.filter,
+      });
+    },
+
+    clearSearch() {
+      this.filter = '';
+      this.onSearch();
+    },
+
+    clearproductData() {
+      this.clearError();
+      this.selectedImage = null;
+      this.imageUrl = null;
+      this.productData = {
+        category_id: null,
+        name: null,
+        price: null,
+        quantitiy: null,
+        detail: null,
+      };
+    },
+
+    async openFormModal(id = null) {
+      try {
+        this.clearproductData();
+        await this.getAllCategory();
+
+        if (id != null) {
+          this.selectedId = id;
+          this.selectedAction = 'edit';
+          const res = await this.getProduct({ id });
+          this.productData.category_id = res.category_id;
+          this.productData.name = res.name;
+          this.productData.price = res.price;
+          this.productData.quantity = res.quantity;
+          this.productData.detail = res.detail;
+          this.imageUrl = res.image_url;
+          // console.log({ cat_id: res.category_id });
+        } else {
+          this.selectedId = null;
+          this.selectedAction = 'create';
+          this.clearProduct();
+        }
+        this.formModal = true;
+        this.selectedImage = null;
+        this.clearError();
+      } catch (error) {
+        // console.log(error);
+        this.$toast.error('Error get data');
+        return error;
       }
     },
 
-    computed: {
-      ...mapState("product", ["productList", "productData", "errorData"]),
-      ...mapState("category", ["allCategory"]),
+    closeFormModal() {
+      this.formModal = false;
+      this.clearError();
     },
 
-    mounted() {
-      this.fetchData()
-      this.clearError()
-    },
-
-    watch: {
-      currentPage(newVal) {
-        this.getAllProductList({
-          page: newVal,
-          per_page: this.perPage,
-          filter: this.filter,
-        })
-      },
-      perPage(newVal) {
-        this.getAllProductList({
-          page: this.currentPage,
-          per_page: newVal,
-          filter: this.filter,
-        })
-      },
-      productList(newVal) {
-        if (newVal.data.length == 0) {
-          this.$toast.error("Data not Found!", {
-            duration: 800,
-          })
-        }
-      },
-    },
-    methods: {
-      ...mapActions("product", [
-        "getAllProductList",
-        "getProduct",
-        "updateProduct",
-        "createProduct",
-        "deleteProduct",
-        "clearProduct",
-        "clearError",
-      ]),
-      ...mapActions("category", ["getAllCategory"]),
-
-      clearImage() {
-        this.selectedImage = null
-      },
-
-      async onSearch() {
-        this.currentPage = 1
-        await this.getAllProductList({
-          page: this.currentPage,
-          per_page: this.perPage,
-          filter: this.filter,
-        })
-      },
-
-      clearSearch() {
-        this.filter = ""
-        this.onSearch()
-      },
-
-      async openFormModal(id = null) {
-        this.formModal = true
-        this.selectedImage = null
-        this.clearError()
-        await this.getAllCategory()
-
-        if (id != null) {
-          this.selectedId = id
-          this.selectedAction = "edit"
-          this.getProduct({ id })
-        } else {
-          this.selectedId = null
-          this.selectedAction = "create"
-          this.clearProduct()
-        }
-      },
-
-      closeFormModal() {
-        this.formModal = false
-        this.clearError()
-      },
-
-      confirmDelete(name, id) {
-        this.selectedId = id
-        try {
-          this.$swal({
-            title: "Are you sure?",
-            text:
-              name +
-              " " +
-              "will be Deleted, And you won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "rgba(52,211,153,1)",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              try {
-                await this.deleteProduct({ id: this.selectedId })
-                this.fetchData()
-                this.$swal(
-                  "Deleted!",
-                  "The product data has been deleted.",
-                  "success"
-                )
-              } catch (error) {
-                console.log(error)
-              }
-            }
-          })
-        } catch (error) {
-          console.log(error)
-        }
-      },
-
-      async submitProduct() {
-        try {
-          const formData = new FormData()
-          if (this.selectedImage != null) {
-            formData.append("image", this.selectedImage)
-          }
-          if (this.productData.name) {
-            formData.append("name", this.productData.name)
-          }
-          if (this.productData.category_id) {
-            formData.append("category_id", this.productData.category_id)
-          }
-          if (this.productData.price) {
-            formData.append("price", this.productData.price)
-          }
-          if (this.productData.detail) {
-            formData.append("detail", this.productData.detail)
-          }
-          if (this.productData.quantity) {
-            formData.append("quantity", this.productData.quantity)
-          }
-
-          if (this.selectedAction == "create") {
+    confirmDelete(name, id) {
+      this.selectedId = id;
+      try {
+        this.$swal({
+          title: 'Are you sure?',
+          text:
+            name +
+            ' ' +
+            "will be Deleted, And you won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: 'rgba(52,211,153,1)',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
             try {
-              await this.createProduct({ payload: formData })
-              this.closeFormModal()
-              this.fetchData()
-              this.$toast.success("Data Saved Successfully", {
-                duration: 3000,
-              })
-              this.selectedImage = null
-              this.clearError()
+              await this.deleteProduct({ id: this.selectedId });
+              this.fetchData();
+              this.$swal(
+                'Deleted!',
+                'The product data has been deleted.',
+                'success',
+              );
             } catch (error) {
-              console.log(error)
-              this.$toast.error(error.message)
-            }
-          } else if (this.selectedAction == "edit") {
-            try {
-              await this.updateProduct({
-                id: this.selectedId,
-                payload: formData,
-              })
-              this.closeFormModal()
-              this.fetchData()
-              this.$toast.success("Data Saved Successfully", {
-                duration: 3000,
-              })
-              this.selectedImage = null
-              this.clearError()
-            } catch (error) {
-              console.log(error)
-              this.$toast.error(error.message)
+              console.log(error);
             }
           }
-        } catch (error) {
-          console.log(error)
-          this.$toast.error(error.message)
-        }
-      },
-
-      async onFileChange(e) {
-        this.selectedImage = e.target.files[0]
-        if (!!this.selectedImage && this.selectedImage.size > 2048000) {
-          this.$toast.error("File size must be lower than 2MB.", {
-            duration: 3000,
-          })
-        }
-      },
-
-      async fetchData() {
-        await this.getAllProductList({
-          filter: this.filter,
-          page: this.currentPage,
-          per_page: this.perPage,
-        })
-      },
+        });
+      } catch (error) {
+        console.log(error);
+      }
     },
-  }
+
+    async submitProduct() {
+      this.submitted = true;
+      try {
+        const formData = new FormData();
+        if (!this.imageUrl) {
+          this.$toast.error('Please select an image.');
+          return;
+        }
+        if (!this.productData.category_id) {
+          this.$toast.error('Please select a category.');
+          return;
+        }
+        if (this.selectedImage != null) {
+          formData.append('image', this.selectedImage);
+        }
+        if (this.productData.name) {
+          formData.append('name', this.productData.name);
+        }
+        if (this.productData.category_id) {
+          formData.append('category_id', this.productData.category_id);
+        }
+        if (this.productData.price) {
+          formData.append('price', this.productData.price);
+        }
+        if (this.productData.detail) {
+          formData.append('detail', this.productData.detail);
+        }
+        if (this.productData.quantity) {
+          formData.append('quantity', this.productData.quantity);
+        }
+
+        if (this.selectedAction == 'create') {
+          try {
+            await this.createProduct({ payload: formData });
+            this.closeFormModal();
+            this.fetchData();
+            this.$toast.success('Data Saved Successfully', {
+              duration: 3000,
+            });
+            this.selectedImage = null;
+            this.clearError();
+          } catch (error) {
+            console.log(error);
+            this.$toast.error(error.message);
+          } finally {
+            this.submitted = false;
+          }
+        } else if (this.selectedAction == 'edit') {
+          try {
+            await this.updateProduct({
+              id: this.selectedId,
+              payload: formData,
+            });
+            this.closeFormModal();
+            this.fetchData();
+            this.$toast.success('Data Saved Successfully', {
+              duration: 3000,
+            });
+            this.selectedImage = null;
+            this.clearError();
+          } catch (error) {
+            console.log(error);
+            this.$toast.error(error.message);
+          } finally {
+            this.submitted = false;
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        this.$toast.error(error.message);
+      } finally {
+        this.submitted = false;
+      }
+    },
+
+    async onFileChange(e) {
+      const file = e.target.files[0];
+
+      if (!file) {
+        this.$toast.error('Please select a image file.', {
+          duration: 3000,
+        });
+        return;
+      }
+
+      const validImageTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+      ];
+
+      if (!validImageTypes.includes(file.type)) {
+        this.$toast.error('Please select a valid image file.', {
+          duration: 3000,
+        });
+        return;
+      }
+
+      if (file.size > 2048000) {
+        // 2MB size limit
+        this.$toast.error('File size must be lower than 2MB.', {
+          duration: 3000,
+        });
+        return;
+      }
+
+      this.selectedImage = file;
+      this.imageUrl = URL.createObjectURL(this.selectedImage);
+    },
+
+    async fetchData() {
+      await this.getAllProductList({
+        filter: this.filter,
+        page: this.currentPage,
+        per_page: this.perPage,
+      });
+    },
+  },
+};
 </script>

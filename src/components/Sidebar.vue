@@ -74,7 +74,7 @@
           </router-link>
         </div>
 
-        <div class="px-4">
+        <!-- <div class="px-4">
           <p class="text-sm font-semibold">Kelola Laporan</p>
 
           <router-link
@@ -88,32 +88,32 @@
             </span>
             <span class="text-gray-700">Laporan Transaksi</span>
           </router-link>
-        </div>
+        </div> -->
       </div>
     </perfect-scrollbar>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
-import cartVariant from "vue-material-design-icons/CartVariant";
-import viewDashboard from "vue-material-design-icons/ViewDashboard";
-import warehouse from "vue-material-design-icons/Warehouse";
-import accountSupervisorCircle from "vue-material-design-icons/AccountSupervisorCircle";
-import clipboardPulse from "vue-material-design-icons/ClipboardPulse";
+import { mapActions, mapState } from 'vuex';
+import cartVariant from 'vue-material-design-icons/CartVariant';
+import viewDashboard from 'vue-material-design-icons/ViewDashboard';
+import warehouse from 'vue-material-design-icons/Warehouse';
+import accountSupervisorCircle from 'vue-material-design-icons/AccountSupervisorCircle';
+// import clipboardPulse from "vue-material-design-icons/ClipboardPulse";
 export default {
-  name: "Sidebar",
+  name: 'Sidebar',
   components: {
     cartVariant,
     viewDashboard,
     warehouse,
     accountSupervisorCircle,
-    clipboardPulse,
+    // clipboardPulse,
   },
   computed: {
-    ...mapState(["sideBarOpen"]),
-    ...mapState("login", ["profile"]),
-    ...mapState("order", ["unfinishTrans"]),
+    ...mapState(['sideBarOpen']),
+    ...mapState('login', ['profile']),
+    ...mapState('order', ['unfinishTrans']),
   },
   data() {
     return {
@@ -130,14 +130,14 @@ export default {
     },
   },
   methods: {
-    ...mapActions("login", ["handleLogOut"]),
-    ...mapActions("order", ["getUnfinishTrans"]),
+    ...mapActions('login', ['handleLogOut']),
+    ...mapActions('order', ['getUnfinishTrans']),
     toggleSidebar() {
-      this.$store.dispatch("toggleSidebar");
+      this.$store.dispatch('toggleSidebar');
     },
     async onLogout() {
       await this.handleLogOut();
-      await this.$router.push("/login");
+      await this.$router.push('/login');
     },
   },
 };
