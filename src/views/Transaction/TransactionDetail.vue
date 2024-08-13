@@ -23,7 +23,7 @@
               <div class="rounded-xl shadow-md px-1 mb-5">
                 <div>
                   <img
-                    class="h-36 w-full rounded-t-lg"
+                    class="h-36 w-full rounded-t-lg object-contain"
                     :src="product.image_url"
                   />
                 </div>
@@ -60,17 +60,20 @@
                 <div class="flex flex-row align-middle">
                   <t-button
                     fixedClasses="h-7 w-7 rounded-full"
+                    :class="{
+                      'text-gray-400': product.qty >= product.max_qty,
+                      '': product.qty < product.max_qty,
+                    }"
                     class="flex justify-center align-middle"
                     @click="onPlus(product.product_id, product.price)"
+                    :disabled="product.qty >= product.max_qty"
                   >
                     <icon-plus class="w-6 h-6" />
                   </t-button>
                   <div class="px-1">
-                    <input
-                      v-model.number="product.qty"
-                      class="block w-7 px-2 transition duration-100 ease-in-out border rounded shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      @keyup="onChangeQty(product.product_id, product.price)"
-                    />
+                    <div class="block w-12 px-2 text-center">
+                      {{ product.qty }}
+                    </div>
                   </div>
                   <t-button
                     fixedClasses="h-7 w-7 rounded-full"
@@ -143,9 +146,11 @@
               </div>
               <t-input
                 class="rounded-none"
-                v-model.number="cash"
+                v-model.number="orderData.cash"
                 @keyup="onCashChange"
+                @change="onCashChange"
                 placeholder="Masukan nominal bayar"
+                type="number"
               />
             </div>
             <div class="flex justify-end">
@@ -163,7 +168,7 @@
               <t-button
                 class="w-full"
                 @click="openReceiptModal"
-                :disabled="minus || cash == null"
+                :disabled="minus || orderData.cash == null"
                 >CheckOut</t-button
               >
             </div>
@@ -249,7 +254,7 @@
             </div>
             <div class="flex justify-between">
               <span>Cash</span>
-              <span>{{ cash }}</span>
+              <span>{{ orderData.cash }}</span>
             </div>
             <hr class="my-1" />
             <div class="flex justify-between">
@@ -297,18 +302,18 @@
 }
 </style>
 <script>
-import DashboardLayouts from "../../components/DashboardLayouts.vue";
-import { mapActions, mapState, mapMutations } from "vuex";
-import { mapMultiRowFields } from "vuex-map-fields";
-import IconPlus from "vue-material-design-icons/Plus";
-import IconMinus from "vue-material-design-icons/Minus";
-import cartVariant from "vue-material-design-icons/CartVariant";
+import DashboardLayouts from '../../components/DashboardLayouts.vue';
+import { mapActions, mapState, mapMutations } from 'vuex';
+import { mapMultiRowFields } from 'vuex-map-fields';
+import IconPlus from 'vue-material-design-icons/Plus';
+import IconMinus from 'vue-material-design-icons/Minus';
+import cartVariant from 'vue-material-design-icons/CartVariant';
 export default {
   components: { DashboardLayouts, IconPlus, IconMinus, cartVariant },
   computed: {
-    ...mapState("product", ["productList"]),
-    ...mapMultiRowFields("order", ["orderData.details"]),
-    ...mapState("order", ["orderData"]),
+    ...mapState('product', ['productList']),
+    ...mapMultiRowFields('order', ['orderData.details']),
+    ...mapState('order', ['orderData']),
     filteredItem() {
       return this.productProduct.filter((value) => {
         return value.name
@@ -323,28 +328,27 @@ export default {
       discount: 0,
       changeDiscount: false,
       id: this.$route.params.id,
-      searchProduct: "",
+      searchProduct: '',
       subTotal: 0,
       subTotalItemQty: 0,
       finalTotal: 0,
       totalDiscount: 0,
       change: 0,
-      cash: null,
-      minus: false,
+      minus: true,
       filteredList: [],
       productProduct: [],
       headers: [
         {
-          value: "name",
-          text: "Name",
+          value: 'name',
+          text: 'Name',
         },
         {
-          value: "qty",
-          text: "Qty",
+          value: 'qty',
+          text: 'Qty',
         },
         {
-          value: "subtotal",
-          text: "Subtotal",
+          value: 'subtotal',
+          text: 'Subtotal',
         },
       ],
     };
@@ -363,9 +367,9 @@ export default {
   },
 
   methods: {
-    ...mapActions("product", ["getAllProductList"]),
-    ...mapActions("order", ["getOrder", "updateOrder", "getAllOrderList"]),
-    ...mapMutations("order", ["addSelectedProduct", "removeSelectedProduct"]),
+    ...mapActions('product', ['getAllProductList']),
+    ...mapActions('order', ['getOrder', 'updateOrder', 'getAllOrderList']),
+    ...mapMutations('order', ['addSelectedProduct', 'removeSelectedProduct']),
 
     async syncData() {
       await this.updateOrder({ id: this.id, payload: this.orderData });
@@ -382,8 +386,8 @@ export default {
     async withoutReceipt() {
       this.orderData.checkout = true;
       this.updateOrder({ id: this.id, payload: this.orderData });
-      this.$router.push("/transactions");
-      await this.$toast.success("Transaction success!");
+      this.$router.push('/transactions');
+      await this.$toast.success('Transaction success!');
     },
 
     async withReceipt() {
@@ -392,21 +396,26 @@ export default {
 
     async printReceipt() {
       let printContent = this.$refs.printReceipt.innerHTML;
-      const printArea = document.getElementById("printArea");
+      const printArea = document.getElementById('printArea');
       printArea.innerHTML = printContent;
       window.print();
-      printArea.innerHTML = "";
+      printArea.innerHTML = '';
 
       this.orderData.checkout = true;
       this.updateOrder({ id: this.id, payload: this.orderData });
-      this.$router.push("/transactions");
-      await this.$toast.success("Transaction success!");
+      this.$router.push('/transactions');
+      await this.$toast.success('Transaction success!');
     },
 
     async onMove() {
-      await this.syncData();
-      this.$router.push("/transaction");
-      this.$toast.success("List Updated!");
+      try {
+        await this.updateOrder({ id: this.id, payload: this.orderData });
+        this.$router.push('/transactions');
+        await this.$toast.success('Transaction success!');
+      } catch (error) {
+        console.log(error);
+        this.$toast.error(error.message);
+      }
     },
 
     countTransaction() {
@@ -423,17 +432,17 @@ export default {
       this.orderData.discount_value = this.totalDiscount;
       this.orderData.discount_percentage = this.discount;
       this.finalTotal = this.subTotal - this.totalDiscount;
-      this.change = this.cash - this.finalTotal;
+      this.change = this.orderData.cash - this.finalTotal;
     },
 
     onCashChange() {
-      this.change = this.cash - this.finalTotal;
-      if (this.cash < this.finalTotal) {
+      this.change = this.orderData.cash - this.finalTotal;
+      if (this.orderData.cash < this.finalTotal) {
         this.minus = true;
       } else {
         this.minus = false;
       }
-      this.orderData.cash = this.cash;
+      // this.orderData.cash = this.orderData.cash;
       this.orderData.change = this.change;
     },
 
@@ -445,8 +454,8 @@ export default {
           image_url: value.image_url,
           name: value.name,
           price: value.price,
-          qty: value.qty,
-          slug: value.slug,
+          qty: value.quantity,
+          slug: value.detail,
           total_price: value.total_price,
         };
       });
@@ -457,43 +466,61 @@ export default {
       this.changeDiscount = !this.changeDiscount;
     },
 
-    onSelectProduct(id) {
-      let findProduct = this.productProduct.find(
-        (value) => value.product_id === id
+    async onSelectProduct(id) {
+      const findProduct = this.productProduct.find(
+        (value) => value.product_id === id,
       );
+      let data = { ...findProduct };
+      // console.log({ productProduct: this.productProduct });
       let checkExists = this.details.some((value) => value.product_id === id);
       if (checkExists) {
+        // console.log({ data });
         let findIndex = this.details.findIndex(
-          (value) => value.product_id === id
+          (value) => value.product_id === id,
         );
-        let qty = this.details[findIndex].qty;
+        const selectedDetails = this.details[findIndex];
+        let qty = selectedDetails.qty;
 
-        this.details[findIndex].qty = qty + 1;
-        this.details[findIndex].total_price = (qty + 1) * findProduct.price;
+        if (qty < data.qty) {
+          selectedDetails.qty = qty + 1;
+          selectedDetails.total_price = (qty + 1) * data.price;
+        } else {
+          await this.$toast.error(`Exceed the quantity limit ${data.qty}!`);
+        }
       } else {
-        findProduct.qty = 1;
-        findProduct.total_price = findProduct.price;
-        let pushData = Object.assign({}, findProduct);
-        this.addSelectedProduct(pushData);
+        if (data.qty > 0) {
+          data.max_qty = data.qty;
+          data.qty = 1;
+          data.total_price = data.price;
+          let pushData = Object.assign({}, data);
+          this.addSelectedProduct(pushData);
+        } else {
+          await this.$toast.error(`Exceed the quantity limit ${data.qty}!`);
+        }
       }
       this.countTransaction();
     },
 
     onPlus(id, paramHarga) {
       const price = paramHarga;
+
       let currentIndex = this.details.findIndex(
-        (value) => value.product_id === id
+        (value) => value.product_id === id,
       );
-      let qty = this.details[currentIndex].qty;
-      this.details[currentIndex].qty += 1;
-      this.details[currentIndex].total_price = (qty + 1) * price;
+      const selectedDetails = this.details[currentIndex];
+
+      // console.log({ selectedDetails });
+
+      let qty = selectedDetails.qty;
+      selectedDetails.qty += 1;
+      selectedDetails.total_price = (qty + 1) * price;
       this.countTransaction();
     },
 
     onChangeQty(id, paramHarga) {
       const price = paramHarga;
       let currentIndex = this.details.findIndex(
-        (value) => value.product_id === id
+        (value) => value.product_id === id,
       );
       let qty = this.details[currentIndex].qty;
       this.details[currentIndex].total_price = qty * price;
@@ -503,7 +530,7 @@ export default {
     onMin(id, paramHarga) {
       const price = paramHarga;
       let currentIndex = this.details.findIndex(
-        (value) => value.product_id === id
+        (value) => value.product_id === id,
       );
       let qty = this.details[currentIndex].qty;
       if (qty > 1) {

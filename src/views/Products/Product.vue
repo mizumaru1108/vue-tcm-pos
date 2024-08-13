@@ -187,7 +187,7 @@
               </span>
             </div>
             <div>
-              <label for="">Harga</label>
+              <label for="">Kuantitas</label>
               <t-input
                 v-model.number="productData.quantity"
                 type="number"

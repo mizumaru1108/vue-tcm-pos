@@ -43,7 +43,7 @@
       class="absolute bg-gray-100 border border-t-0 shadow-xl text-gray-700 rounded-b-lg w-48 top-20 right-0 mr-6"
       :class="dropDownOpen ? '' : 'hidden'"
     >
-      <a href="#" class="block px-4 py-2 hover:bg-green-300">Account</a>
+      <!-- <a href="#" class="block px-4 py-2 hover:bg-green-300">Account</a> -->
       <a href="#" class="block px-4 py-2 hover:bg-green-300" @click="onLogout"
         >Logout</a
       >
@@ -53,12 +53,12 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState } from 'vuex';
 export default {
-  name: "Navbar",
+  name: 'Navbar',
   computed: {
-    ...mapState(["sideBarOpen"]),
-    ...mapState("login", ["profile"]),
+    ...mapState(['sideBarOpen']),
+    ...mapState('login', ['profile']),
   },
   data() {
     return {
@@ -66,16 +66,16 @@ export default {
     };
   },
   methods: {
-    ...mapActions("login", [
+    ...mapActions('login', [
       // "handleLogin",
-      "handleLogOut",
+      'handleLogOut',
     ]),
     toggleSidebar() {
-      this.$store.dispatch("toggleSidebar");
+      this.$store.dispatch('toggleSidebar');
     },
     async onLogout() {
       await this.handleLogOut();
-      await this.$router.push("/login");
+      await this.$router.push('/login');
     },
   },
 };

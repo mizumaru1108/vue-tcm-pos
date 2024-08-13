@@ -114,10 +114,9 @@
 
                 <t-table :headers="headers" :data="orderList.data">
                   <template slot="row" slot-scope="props">
-                    <tr
-                      @click="onSelectRow(props.row)"
-                      :class="[props.trClass]"
-                    >
+                    <!-- ON Click for tr -->
+                    <!-- @click="onSelectRow(props.row)" -->
+                    <tr :class="[props.trClass]">
                       <td :class="props.tdClass">
                         {{ props.row.created_at }}
                       </td>
@@ -158,115 +157,115 @@
 </template>
 
 <script>
-  import { mapActions, mapState } from "vuex"
-  import DashboardLayouts from "../../components/DashboardLayouts.vue"
+import { mapActions, mapState } from 'vuex';
+import DashboardLayouts from '../../components/DashboardLayouts.vue';
 
-  export default {
-    components: {
-      DashboardLayouts,
+export default {
+  components: {
+    DashboardLayouts,
+  },
+  data() {
+    return {
+      date: '',
+      openTab: 1,
+      status: 1,
+      headers: [
+        {
+          value: 'created_at',
+          text: 'Tanggal',
+        },
+        {
+          value: 'order_number',
+          text: 'order_number',
+        },
+        {
+          value: 'order_code',
+          text: 'order_code',
+        },
+        {
+          value: 'status',
+          text: 'Status',
+        },
+        {
+          value: 'total_price',
+          text: 'Harga',
+        },
+      ],
+    };
+  },
+  computed: {
+    ...mapState('order', ['orderList']),
+    check() {
+      return this.date;
     },
-    data() {
-      return {
-        date: "",
-        openTab: 1,
-        status: 1,
-        headers: [
-          {
-            value: "created_at",
-            text: "Tanggal",
-          },
-          {
-            value: "order_number",
-            text: "order_number",
-          },
-          {
-            value: "order_code",
-            text: "order_code",
-          },
-          {
-            value: "status",
-            text: "Status",
-          },
-          {
-            value: "total_price",
-            text: "Harga",
-          },
-        ],
+  },
+  watch: {
+    check(date) {
+      if (date == '') {
+        this.fetchData();
       }
     },
-    computed: {
-      ...mapState("order", ["orderList"]),
-      check() {
-        return this.date
-      },
+  },
+
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    ...mapActions('order', {
+      getAllOrderList: 'getAllOrderList',
+      createOrder: 'createOrder',
+      getUnfinishTrans: 'getUnfinishTrans',
+    }),
+
+    fetchData() {
+      this.getAllOrderList({ status: this.status });
     },
-    watch: {
-      check(date) {
-        if (date == "") {
-          this.fetchData()
+
+    onDateChange() {
+      if (this.date) {
+        if (this.date.length == 1) {
+          this.getAllOrderList({
+            fromdate: this.date[0],
+          });
         }
-      },
+        if (this.date.length > 1) {
+          this.getAllOrderList({
+            fromdate: this.date[0],
+            todate: this.date[1],
+          });
+        }
+      }
     },
 
-    mounted() {
-      this.fetchData()
+    toggleTabs: function(tabNumber) {
+      this.openTab = tabNumber;
+      if (this.openTab == 1) {
+        this.status = 1;
+        this.getUnfinishTrans();
+      } else {
+        this.status = 2;
+      }
+      this.getAllOrderList({
+        status: this.status,
+      });
     },
-    methods: {
-      ...mapActions("order", {
-        getAllOrderList: "getAllOrderList",
-        createOrder: "createOrder",
-        getUnfinishTrans: "getUnfinishTrans",
-      }),
 
-      fetchData() {
-        this.getAllOrderList({ status: this.status })
-      },
-
-      onDateChange() {
-        if (this.date) {
-          if (this.date.length == 1) {
-            this.getAllOrderList({
-              fromdate: this.date[0],
-            })
-          }
-          if (this.date.length > 1) {
-            this.getAllOrderList({
-              fromdate: this.date[0],
-              todate: this.date[1],
-            })
-          }
-        }
-      },
-
-      toggleTabs: function(tabNumber) {
-        this.openTab = tabNumber
-        if (this.openTab == 1) {
-          this.status = 1
-          this.getUnfinishTrans()
-        } else {
-          this.status = 2
-        }
-        this.getAllOrderList({
-          status: this.status,
-        })
-      },
-
-      async onCreateOrder() {
-        await this.createOrder()
-        await this.getAllOrderList()
-        await this.getUnfinishTrans()
-      },
-
-      onSelectRow(row) {
-        if (row.status == 1) {
-          this.$router.push({
-            name: "TransactionDetail",
-            params: { id: row.id },
-          })
-        } else {
-          this.$router.push("/transaction-report")
-        }
-      },
+    async onCreateOrder() {
+      await this.createOrder();
+      await this.getAllOrderList();
+      await this.getUnfinishTrans();
     },
-  }
+
+    onSelectRow(row) {
+      if (row.status == 1) {
+        this.$router.push({
+          name: 'TransactionDetail',
+          params: { id: row.id },
+        });
+      } else {
+        this.$router.push('/transaction-report');
+      }
+    },
+  },
+};
 </script>
