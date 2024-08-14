@@ -78,12 +78,12 @@
           <div class="flex flex-col">
             <div class="flex justify-between py-2">
               <span>Latest Transaction</span>
-              <!-- <button
+              <button
                 @click="onMore"
                 class="block px-2 transition duration-100 ease-in-out focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed bg-custom-color2 border border-black"
               >
                 More
-              </button> -->
+              </button>
             </div>
 
             <div

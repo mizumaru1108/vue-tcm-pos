@@ -74,7 +74,7 @@
           </router-link>
         </div>
 
-        <!-- <div class="px-4">
+        <div class="px-4">
           <p class="text-sm font-semibold">Kelola Laporan</p>
 
           <router-link
@@ -88,7 +88,7 @@
             </span>
             <span class="text-gray-700">Laporan Transaksi</span>
           </router-link>
-        </div> -->
+        </div>
       </div>
     </perfect-scrollbar>
   </div>
@@ -100,7 +100,7 @@ import cartVariant from 'vue-material-design-icons/CartVariant';
 import viewDashboard from 'vue-material-design-icons/ViewDashboard';
 import warehouse from 'vue-material-design-icons/Warehouse';
 import accountSupervisorCircle from 'vue-material-design-icons/AccountSupervisorCircle';
-// import clipboardPulse from "vue-material-design-icons/ClipboardPulse";
+import clipboardPulse from 'vue-material-design-icons/ClipboardPulse';
 export default {
   name: 'Sidebar',
   components: {
@@ -108,7 +108,7 @@ export default {
     viewDashboard,
     warehouse,
     accountSupervisorCircle,
-    // clipboardPulse,
+    clipboardPulse,
   },
   computed: {
     ...mapState(['sideBarOpen']),
