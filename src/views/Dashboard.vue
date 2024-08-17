@@ -116,6 +116,77 @@
         </div>
       </div>
     </div>
+
+    <!-- Counter Start -->
+    <!-- <div class="flex justify-center flex-grow h-full flex-col lg:flex-row">
+      <div class="w-full p-1">
+        <div class="flex flex-col lg:flex-row flex-wrap">
+          <div class="w-full mb-2 lg:w-6/12 lg:pr-1">
+            <div class="flex bg-white rounded-xl shadow p-2">
+              <div class="flex flex-col py-3 px-2">
+                <t-button
+                  fixedClasses="h-7 w-7 rounded-full"
+                  class="flex justify-center align-middle"
+                  @click="incerementDataCount"
+                >
+                  <icon-plus class="w-6 h-6" />
+                </t-button>
+                <span class="text-sm">{{ dataCount.inct }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="w-full mb-2 lg:w-6/12 lg:pr-1">
+            <div class="flex bg-white rounded-xl shadow p-2">
+              <div class="flex flex-col py-3 px-2">
+                <t-button
+                  fixedClasses="h-7 w-7 rounded-full"
+                  class="flex justify-center align-middle"
+                  @click="decrementDataCount"
+                >
+                  <icon-minus class="w-6 h-6" />
+                </t-button>
+                <span class="text-sm">{{ dataCount.decrement }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-center flex-grow h-full flex-col lg:flex-row">
+      <div class="w-full p-1">
+        <div class="flex flex-col lg:flex-row flex-wrap">
+          <div class="w-full mb-2 lg:w-6/12 lg:pr-1">
+            <div class="flex bg-white rounded-xl shadow p-2">
+              <div class="flex flex-col py-3 px-2">
+                <t-button
+                  fixedClasses="h-7 w-7 rounded-full"
+                  class="flex justify-center align-middle"
+                  @click="multiplyDataCount"
+                >
+                  <icon-close class="w-6 h-6" />
+                </t-button>
+                <span class="text-sm">{{ dataCount.multiply }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="w-full mb-2 lg:w-6/12 lg:pr-1">
+            <div class="flex bg-white rounded-xl shadow p-2">
+              <div class="flex flex-col py-3 px-2">
+                <t-button
+                  fixedClasses="h-7 w-7 rounded-full"
+                  class="flex justify-center align-middle"
+                  @click="divideDataCount"
+                >
+                  <icon-division class="w-6 h-6" />
+                </t-button>
+                <span class="text-sm">{{ dataCount.divide }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <!-- Counter End -->
   </dashboard-layouts>
 </template>
 <script>
@@ -124,12 +195,22 @@ import BarChart from '../components/BarChart.vue';
 import DashboardLayouts from '../components/DashboardLayouts.vue';
 import SwapHorizontal from 'vue-material-design-icons/SwapHorizontal';
 
+//
+// import IconPlus from 'vue-material-design-icons/Plus';
+// import IconMinus from 'vue-material-design-icons/Minus';
+// import IconClose from 'vue-material-design-icons/Close';
+// import IconDivision from 'vue-material-design-icons/Division';
+
 export default {
   name: 'Home',
   components: {
     DashboardLayouts,
     BarChart,
     SwapHorizontal,
+    // IconPlus,
+    // IconMinus,
+    // IconClose,
+    // IconDivision,
   },
   data: () => ({
     weeklyCount: 0,
@@ -168,6 +249,7 @@ export default {
       'dashboardYearlyReport',
       'dashboardRecentTransaction',
     ]),
+    ...mapState('counter', ['dataCount']),
   },
   async mounted() {
     await this.fetchData();
@@ -181,6 +263,14 @@ export default {
       'getDashboardWeeklyReport',
       'getDashboardYearlyReport',
       'getDashboardRecentTransaction',
+    ]),
+
+    ...mapActions('counter', [
+      'onIncrementDataCount',
+      'onDecrementDataCount',
+      'onMultiplyDataCount',
+      'onDivideDataCount',
+      'onSetCount',
     ]),
 
     async fetchData() {
@@ -204,6 +294,28 @@ export default {
 
     onMore() {
       this.$router.push('/transaction-report');
+    },
+
+    incerementDataCount() {
+      this.onIncrementDataCount();
+    },
+
+    decrementDataCount() {
+      this.onDecrementDataCount();
+    },
+
+    multiplyDataCount() {
+      this.onMultiplyDataCount();
+    },
+
+    divideDataCount() {
+      this.onDivideDataCount();
+    },
+
+    countDataCount() {
+      const inct = parseInt(this.dataCount.inct);
+      const count = parseInt(this.dataCount.count);
+      this.onSetCount(count + inct + 1);
     },
   },
 };

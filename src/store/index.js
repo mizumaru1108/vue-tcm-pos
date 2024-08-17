@@ -1,17 +1,17 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import Vue from 'vue';
+import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-import login from "./module/login.module";
-import user from "./module/user.module";
-import category from "./module/category.module";
-import product from "./module/product.module";
-import order from "./module/order.module";
-import report from "./module/report.module";
+import login from './module/login.module';
+import user from './module/user.module';
+import category from './module/category.module';
+import product from './module/product.module';
+import order from './module/order.module';
+import report from './module/report.module';
+import counter from './module/counter.module';
 
-
-import createPersistedState from "vuex-persistedstate";
+import createPersistedState from 'vuex-persistedstate';
 
 export default new Vuex.Store({
   state: {
@@ -29,7 +29,7 @@ export default new Vuex.Store({
   },
   actions: {
     toggleSidebar(context) {
-      context.commit("toggleSidebar");
+      context.commit('toggleSidebar');
     },
   },
   modules: {
@@ -39,6 +39,7 @@ export default new Vuex.Store({
     product,
     order,
     report,
+    counter,
   },
   plugins: [
     createPersistedState({
